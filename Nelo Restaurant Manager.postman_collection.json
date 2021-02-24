@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "ffc5872f-58b0-43f1-9049-3f58bb92ba49",
+		"name": "Nelo Restaurant Manager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a Restaurant",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"De todo\",\r\n    \"endorsements\": [\"Vegetarian,Paleo\"],\r\n    \"tables\": [{\r\n        \"number\": 1,\r\n        \"seats\": 6,\r\n        \"reservations\": []\r\n    },\r\n    {\r\n        \"number\": 2,\r\n        \"seats\": 2,\r\n        \"reservations\": []\r\n    }]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/restaurants/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"restaurants",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create User",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Andres Perez\",\r\n    \"diet\": \"Paleo\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/users/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Reservation",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"restaurantId\": \"57ecf680-7546-11eb-b84b-c1afe807d2e6\",\r\n    \"tableNumber\": \"1\",\r\n    \"date\": \"2021-02-23T16:30\",\r\n    \"users\": [\"86e71dd0-7640-11eb-af31-d9467affb50a\",\"8c70f690-7640-11eb-af31-d9467affb50a\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/reservations/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"reservations",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Reservation",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"restaurantId\": \"57ecf680-7546-11eb-b84b-c1afe807d2e6\",\r\n    \"tableNumber\": \"1\",\r\n    \"date\": \"2021-02-23T16:30\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/reservations/",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"reservations",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Available Reservations",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/reservations/?users=86e71dd0-7640-11eb-af31-d9467affb50a,8c70f690-7640-11eb-af31-d9467affb50a,c1988a20-75fc-11eb-8e25-11d968647203&dateFrom=2021-02-23T16:30&dateTo=2021-02-23T18:30",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"reservations",
+						""
+					],
+					"query": [
+						{
+							"key": "users",
+							"value": "86e71dd0-7640-11eb-af31-d9467affb50a,8c70f690-7640-11eb-af31-d9467affb50a,c1988a20-75fc-11eb-8e25-11d968647203"
+						},
+						{
+							"key": "dateFrom",
+							"value": "2021-02-23T16:30"
+						},
+						{
+							"key": "dateTo",
+							"value": "2021-02-23T18:30"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

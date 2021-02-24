@@ -23,3 +23,7 @@ And then:
 
 A test environment is already reachable at the base URL:
 https://ptsno8z075.execute-api.us-east-1.amazonaws.com/Prod
+
+## Postman
+
+A postman collection is added at root. Set up the {{baseUrl}} variable to the one described above or to your own created API Gateway.

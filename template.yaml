@@ -1,0 +1,200 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  nelo-restaurant-manager
+
+  Prototype for restaurants reservations manager
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Models:
+        RestaurantCreate:
+          type: object
+          required:
+            - name
+            - endorsements
+            - tables
+          properties:
+            name:
+              type: string
+            endorsements:
+              type: array
+              items:
+                type: string
+            tables:
+              type: array
+              items:
+                type: string
+  RestaurantsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: restaurants
+  UsersTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: users
+  ReservationsTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+        - AttributeName: "date"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+        - AttributeName: "date"
+          KeyType: "RANGE"
+      BillingMode: PAY_PER_REQUEST
+      TableName: "reservations"
+  CreateRestaurantFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: app/
+      Handler: restaurants.create
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          RESTAURANTS_TABLE: !Ref RestaurantsTable
+      Events:
+        CreateRestaurant:
+          Type: Api
+          Properties:
+            Path: /restaurants
+            Method: PUT
+            RestApiId:
+              Ref: ApiGatewayApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RestaurantsTable
+  ListRestaurantFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: app/
+      Handler: restaurants.list
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          RESTAURANTS_TABLE: !Ref RestaurantsTable
+      Events:
+        CreateRestaurant:
+          Type: Api
+          Properties:
+            Path: /restaurants
+            Method: GET
+            RestApiId:
+              Ref: ApiGatewayApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RestaurantsTable
+  CreateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: app/
+      Handler: users.create
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        CreateRestaurant:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: PUT
+            RestApiId:
+              Ref: ApiGatewayApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+  AvailableReservationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: app/
+      Handler: reservations.available
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          RESTAURANTS_TABLE: !Ref RestaurantsTable
+          USERS_TABLE: !Ref UsersTable
+          RESERVATIONS_TABLE: !Ref ReservationsTable
+      Events:
+        CreateRestaurant:
+          Type: Api
+          Properties:
+            Path: /reservations
+            Method: GET
+            RestApiId:
+              Ref: ApiGatewayApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReservationsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RestaurantsTable
+  CreateReservationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: app/
+      Handler: reservations.create
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          RESERVATIONS_TABLE: !Ref ReservationsTable
+          USERS_TABLE: !Ref UsersTable
+      Events:
+        CreateRestaurant:
+          Type: Api
+          Properties:
+            Path: /reservations
+            Method: PUT
+            RestApiId:
+              Ref: ApiGatewayApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReservationsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+  DeleteReservationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: app/
+      Handler: reservations.delete
+      Runtime: nodejs14.x
+      Environment:
+        Variables:
+          RESERVATIONS_TABLE: !Ref ReservationsTable
+      Events:
+        CreateRestaurant:
+          Type: Api
+          Properties:
+            Path: /reservations
+            Method: DELETE
+            RestApiId:
+              Ref: ApiGatewayApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReservationsTable
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ReservationsApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/restaurants/"
+  CreateRestaurantFunction:
+    Description: "Create Restaurant Lambda Function ARN"
+    Value: !GetAtt CreateRestaurantFunction.Arn
+  CreateRestaurantFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt CreateRestaurantFunctionRole.Arn
